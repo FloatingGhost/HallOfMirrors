@@ -18,6 +18,24 @@ defmodule HallofmirrorsWeb.AccountController do
 
     if changeset.valid? do
       {:ok, account} = Repo.insert(changeset)
+      {:ok, pid} = Hallofmirrors.StreamWatcher.start_link([])
+      Hallofmirrors.StreamWatcher.restart(pid)
+      redirect(conn, to: "/")
+    end
+  end
+
+  def edit_form(conn, %{"id" => id}) do
+    with %Account{} = account <- Repo.get(Account, id) do
+      render(conn, "edit_account.html", account: account)
+    end
+  end
+
+  def edit(conn, %{"id" => id} = params) do
+    with %Account{} = account <- Repo.get(Account, id) do
+      changeset = Account.edit_changeset(account, params)
+      {:ok, _} = Repo.update(changeset)
+      {:ok, pid} = Hallofmirrors.StreamWatcher.start_link([])
+      Hallofmirrors.StreamWatcher.restart(pid)
       redirect(conn, to: "/")
     end
   end

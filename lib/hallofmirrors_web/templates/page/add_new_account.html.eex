@@ -14,5 +14,5 @@
   <label for="mirroring">Mirroring: </label>
   <input name="mirroring" type="text" placeholder="@meme @test @hello" />
 
-  <button>Submit</button>
+  <button>Add</button>
 </form>

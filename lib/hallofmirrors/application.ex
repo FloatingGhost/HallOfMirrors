@@ -14,7 +14,7 @@ defmodule Hallofmirrors.Application do
       HallofmirrorsWeb.Endpoint,
       # Starts a worker by calling: Hallofmirrors.Worker.start_link(arg)
       # {Hallofmirrors.Worker, arg},
-      {Hallofmirrors.Authenticator, []}
+      Hallofmirrors.StreamWatcher,
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

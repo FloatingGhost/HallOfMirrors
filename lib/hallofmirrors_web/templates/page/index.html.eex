@@ -5,6 +5,8 @@
       <tr>
         <th>Name</th>
         <th>Last Tweeted At</th>
+        <th>Mirroring</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>

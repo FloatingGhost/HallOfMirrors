@@ -23,6 +23,12 @@ defmodule Hallofmirrors.Account do
     |> put_assoc(:instance, params["instance"])
   end
 
+  def edit_changeset(struct, params) do
+    struct
+    |> cast(params, [:name, :twitter_tags, :mirroring])
+    |> put_twitter_tags()           
+  end
+
   defp validate_login(changeset, %{"email" => email, "password" => password, "instance" => instance}) do
     case Hallofmirrors.Authenticator.login(instance, email, password) do
       {:ok, token} ->
@@ -43,6 +49,7 @@ defmodule Hallofmirrors.Account do
         tag
         |> String.trim()
         |> String.replace_leading("@", "")
+        |> String.downcase()
       end))
   end
 end

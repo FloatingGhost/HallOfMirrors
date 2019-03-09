@@ -1,0 +1,11 @@
+<section>
+  <%= form_tag("/accounts/#{@account.id}", method: :post) %>
+    <label for="name">Account Name: </label>
+    <input name="name" required type="text" value="<%= @account.name %>"/>
+
+    <label for="mirroring">Mirroring: </label>
+    <input name="mirroring" type="text" placeholder="@meme @test @hello" value="<%= Enum.join(@account.twitter_tags, " ") %>" />
+
+    <button>Save</button>
+  </form>
+</section>

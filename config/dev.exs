@@ -73,3 +73,8 @@ config :hallofmirrors, Hallofmirrors.Repo,
   database: "hallofmirrors_dev",
   hostname: "localhost",
   pool_size: 10
+if File.exists?("./config/dev.secret.exs") do
+  import_config "dev.secret.exs"
+else
+  IO.puts("No dev.secret.exs configured, using default conf")
+end

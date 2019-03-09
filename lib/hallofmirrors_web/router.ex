@@ -18,6 +18,8 @@ defmodule HallofmirrorsWeb.Router do
 
     get "/", PageController, :index
     post "/accounts", AccountController, :create
+    get "/accounts/:id", AccountController, :edit_form
+    post "/accounts/:id", AccountController, :edit
   end
 
   # Other scopes may use custom stacks.
