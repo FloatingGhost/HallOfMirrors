@@ -119,7 +119,7 @@ defmodule Hallofmirrors.WatchTask do
     |> (&Path.join("/tmp/", &1)).()
   end
 
-  defp get_photos(%{extended_entities: entities}) do
+  defp get_photos(%{extended_entities: entities}) when is_list(entities) do
     entities
     |> Map.get(:media, [])
     |> Enum.filter(fn entity -> entity.type == "photo" end)
