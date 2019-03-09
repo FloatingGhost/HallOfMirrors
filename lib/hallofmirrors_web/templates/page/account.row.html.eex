@@ -1,0 +1,4 @@
+<tr>
+  <td><%= @account.name %></td>
+  <td><%= @account.last_tweeted_at %></td>
+</tr>

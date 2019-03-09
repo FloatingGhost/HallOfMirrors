@@ -1,0 +1,16 @@
+<section>
+  <%= render("add_new_account.html") %>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Last Tweeted At</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= for account <- @accounts do %>
+        <%= render("account.row.html", account: account) %>
+      <% end %>
+    </tbody>
+  </table>
+</section>
