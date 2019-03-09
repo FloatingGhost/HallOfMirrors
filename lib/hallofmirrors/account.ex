@@ -50,6 +50,7 @@ defmodule Hallofmirrors.Account do
         |> String.trim()
         |> String.replace_leading("@", "")
         |> String.downcase()
-      end))
+      end)
+      |> Enum.filter(fn x -> x != "" end))
   end
 end

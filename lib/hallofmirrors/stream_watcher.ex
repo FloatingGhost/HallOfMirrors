@@ -21,23 +21,22 @@ defmodule Hallofmirrors.StreamWatcher do
   end
 
   def init(_) do  
-    pid = start_stream_link()
-    {:ok, pid}
+    {:ok, Hallofmirrors.WatchTask.start_stream()}
   end
 
-  def handle_cast({:restart}, pid) do
+  def handle_cast({:restart}, state) do
     Logger.debug("Restarting stream...")
-    ExTwitter.stream_control(pid, :stop)
-    pid = start_stream_link()
-    {:noreply, pid}
+    if Process.alive?(state) do
+      Process.unlink(state)
+      Process.exit(state, :kill)
+    end 
+    state = Hallofmirrors.WatchTask.start_stream()
+    {:noreply, state}
   end
 
   def restart(pid) do
+    Logger.debug("Throwing restart...")
     GenServer.cast(pid, {:restart})
-  end
-
-  defp start_stream_link do
-    Task.start_link(Hallofmirrors.WatchTask, :start_stream, [])
   end
 
 end 
