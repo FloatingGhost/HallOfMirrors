@@ -8,7 +8,7 @@ defmodule Hallofmirrors.WatchTask do
   }
 
   def start_stream do
-    Logger.debug("Starting stream...")
+    Logger.info("Starting stream...")
     spawn_link(fn ->
       Logger.debug("Link to stream...")
       ExTwitter.stream_filter([follow: get_follows()], :infinity)
@@ -83,6 +83,10 @@ defmodule Hallofmirrors.WatchTask do
 
     headers = [{"authorization", account.token}]
     req = HTTPoison.post(create_url, {:multipart, post_body}, headers)
+
+    account
+    |> Account.last_tweeted_changeset()
+    |> Repo.update()
   end
 
   defp upload_media(account, tweet) do

@@ -9,7 +9,7 @@ defmodule Hallofmirrors.Account do
     field :email, :string, virtual: true
     field :password, :string, virtual: true
     field :mirroring, :string, virtual: true
-    field :last_tweeted_at, :utc_datetime
+    field :last_tweeted_at, :utc_datetime_usec
 
     belongs_to :instance, Hallofmirrors.Instance
   end
@@ -27,6 +27,12 @@ defmodule Hallofmirrors.Account do
     struct
     |> cast(params, [:name, :twitter_tags, :mirroring])
     |> put_twitter_tags()           
+  end
+
+  def last_tweeted_changeset(struct) do
+    struct
+    |> Ecto.Changeset.change()
+    |> put_change(:last_tweeted_at, DateTime.utc_now())
   end
 
   defp validate_login(changeset, %{"email" => email, "password" => password, "instance" => instance}) do
