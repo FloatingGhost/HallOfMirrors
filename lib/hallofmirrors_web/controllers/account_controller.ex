@@ -10,7 +10,7 @@ defmodule HallofmirrorsWeb.AccountController do
   def create(conn, %{"instance_url" => url} = params) do
     {:ok, instance} = Instance.find_or_create(%{url: url})
 
-    params = 
+    params =
       params
       |> Map.put("instance", instance)
 

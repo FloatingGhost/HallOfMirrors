@@ -46,10 +46,10 @@ defmodule Hallofmirrors.Authenticator do
 
     case HTTPoison.post(query_uri, query_string, headers) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-          {:ok, body} = Jason.decode(body)
-          %{"token_type" => token_type, "access_token" => access_token} = body
-          token = "#{token_type} #{access_token}"
-          {:ok, token}
+        {:ok, body} = Jason.decode(body)
+        %{"token_type" => token_type, "access_token" => access_token} = body
+        token = "#{token_type} #{access_token}"
+        {:ok, token}
 
       {:ok, %HTTPoison.Response{status_code: code, body: body}} ->
         {:error, body}

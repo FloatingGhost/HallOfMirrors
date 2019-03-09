@@ -9,8 +9,10 @@ defmodule Hallofmirrors.WatchTask do
 
   def start_stream do
     Logger.info("Starting stream...")
+
     spawn_link(fn ->
       Logger.debug("Link to stream...")
+
       ExTwitter.stream_filter([follow: get_follows()], :infinity)
       |> Enum.map(&mirror_tweet/1)
     end)
@@ -35,7 +37,8 @@ defmodule Hallofmirrors.WatchTask do
   end
 
   defp mirror_tweet(tweet) do
-    Logger.debug "MIRRORING..."
+    Logger.debug("MIRRORING...")
+
     from_user =
       tweet
       |> Map.get(:user)
@@ -69,6 +72,7 @@ defmodule Hallofmirrors.WatchTask do
 
   def send_via_account(account, tweet) do
     media_ids = upload_media(account, tweet)
+
     create_url =
       account.instance.url
       |> URI.merge("/api/v1/statuses")
@@ -104,6 +108,7 @@ defmodule Hallofmirrors.WatchTask do
       headers = [{"authorization", account.token}]
       post_body = [{:file, filename}]
       req = HTTPoison.post(upload_url, {:multipart, post_body}, headers)
+
       case req do
         {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
           {:ok, body} = Jason.decode(body)
@@ -119,12 +124,21 @@ defmodule Hallofmirrors.WatchTask do
     |> (&Path.join("/tmp/", &1)).()
   end
 
-  defp get_photos(%{extended_entities: entities}) when is_list(entities) do
-    entities
-    |> Map.get(:media, [])
+  defp get_photos(%{extended_entities: %{} = entities}) do
+    media_list =
+      entities
+      |> Map.get(:media, [])
+
+    media_list =
+      if is_nil(media_list) do
+        []
+      else
+        media_list
+      end
+
+    media_list
     |> Enum.filter(fn entity -> entity.type == "photo" end)
   end
 
   defp get_photos(_), do: []
 end
-

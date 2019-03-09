@@ -26,7 +26,7 @@ defmodule Hallofmirrors.Account do
   def edit_changeset(struct, params) do
     struct
     |> cast(params, [:name, :twitter_tags, :mirroring])
-    |> put_twitter_tags()           
+    |> put_twitter_tags()
   end
 
   def last_tweeted_changeset(struct) do
@@ -35,20 +35,26 @@ defmodule Hallofmirrors.Account do
     |> put_change(:last_tweeted_at, DateTime.utc_now())
   end
 
-  defp validate_login(changeset, %{"email" => email, "password" => password, "instance" => instance}) do
+  defp validate_login(changeset, %{
+         "email" => email,
+         "password" => password,
+         "instance" => instance
+       }) do
     case Hallofmirrors.Authenticator.login(instance, email, password) do
       {:ok, token} ->
         changeset
         |> put_change(:token, token)
+
       {:error, body} ->
         changeset
         |> add_error(:token, body)
     end
-  end 
+  end
 
   defp put_twitter_tags(%{changes: %{mirroring: mirroring}} = changeset) do
     changeset
-    |> put_change(:twitter_tags,
+    |> put_change(
+      :twitter_tags,
       mirroring
       |> String.split(" ")
       |> Enum.map(fn tag ->
@@ -57,6 +63,7 @@ defmodule Hallofmirrors.Account do
         |> String.replace_leading("@", "")
         |> String.downcase()
       end)
-      |> Enum.filter(fn x -> x != "" end))
+      |> Enum.filter(fn x -> x != "" end)
+    )
   end
 end
