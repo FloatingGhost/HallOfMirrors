@@ -1,49 +1,25 @@
-defmodule Hallofmirrors.StreamWatcher do
-  use GenServer
-  require Logger
+defmodule Hallofmirrors.WatchTask do
+  use Task
+
   import Ecto.Query
+  require Logger
 
   alias Hallofmirrors.{
     Repo,
     Account
   }
 
-  def start_link(_) do
-    case GenServer.start_link(__MODULE__, nil, name: {:global, __MODULE__}) do
-      {:ok, pid} ->
-        {:ok, pid}
-      {:error, {:already_started, pid}} ->
-        Process.link(pid)
-        {:ok, pid}
-      :ignore ->
-        :ignore
+
+  def start_link([method]) do
+    Task.start_link(__MODULE__, method, [])
+  end
+
+  def start_stream do
+    Logger.debug("Starting...")
+    stream = ExTwitter.stream_filter(follow: get_follows(), timeout: :infinity)
+    for tweet <- stream do
+      mirror_tweet(tweet)
     end
-  end
-
-  def init(_) do  
-    pid = start_stream()
-    {:ok, pid}
-  end
-
-  def handle_cast({:restart}, pid) do
-    Logger.debug("Restarting stream...")
-    ExTwitter.stream_control(pid, :stop)
-    pid = start_stream()
-    {:noreply, pid}
-  end
-
-  def restart(pid) do
-    GenServer.cast(pid, {:restart})
-  end
-
-  defp start_stream do
-    spawn(fn ->
-      Logger.debug("Spawning...")
-      stream = ExTwitter.stream_filter(follow: get_follows(), timeout: :infinity)
-      for tweet <- stream do
-        mirror_tweet(tweet)
-      end          
-    end)
   end
 
   defp get_follows do
@@ -56,7 +32,7 @@ defmodule Hallofmirrors.StreamWatcher do
       end
     )
     |> Enum.uniq()
-    |> Enum.map(fn username -> 
+    |> Enum.map(fn username ->
       username
       |> ExTwitter.user()
       |> Map.get(:id)
@@ -74,18 +50,18 @@ defmodule Hallofmirrors.StreamWatcher do
 
     tweet
     |> get_photos()
-    |> Enum.map(fn entity -> 
-      url = entity.media_url_https 
+    |> Enum.map(fn entity ->
+      url = entity.media_url_https
       filename = get_filename(url)
-  
+
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} = HTTPoison.get(url)
       :ok = File.write(filename, body)
     end)
-    
+
     from(account in Account, where: ^from_user in account.twitter_tags)
     |> preload(:instance)
     |> Repo.all()
-    |> Task.async_stream(Hallofmirrors.StreamWatcher, :send_via_account, [tweet])
+    |> Task.async_stream(Hallofmirrors.WatchTask, :send_via_account, [tweet])
     |> Enum.into([])
 
     tweet
@@ -145,11 +121,12 @@ defmodule Hallofmirrors.StreamWatcher do
     |> (&Path.join("/tmp/", &1)).()
   end
 
-  defp get_photos(%{entities: entities}) do 
+  defp get_photos(%{entities: entities}) do
     entities
     |> Map.get(:media, [])
     |> Enum.filter(fn entity -> entity.type == "photo" end)
   end
 
   defp get_photos(_), do: []
-end 
+end
+
