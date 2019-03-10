@@ -23,7 +23,13 @@ defmodule Hallofmirrors.StreamWatcher do
   end
 
   def init(_) do
-    {:ok, Hallofmirrors.WatchTask.start_stream()}
+    {:ok, pid} = supervise_stream()
+    {:ok, pid}
+  end
+
+  defp supervise_stream do
+    [{ Hallofmirrors.WatchTask, [] }]
+    |> Supervisor.start_link(strategy: :one_for_one)
   end
 
   def handle_cast({:restart}, state) do
@@ -34,8 +40,17 @@ defmodule Hallofmirrors.StreamWatcher do
       Process.exit(state, :kill)
     end
 
-    state = Hallofmirrors.WatchTask.start_stream()
-    {:noreply, state}
+    {:ok, pid} = supervise_stream()
+    {:noreply, pid}
+  end
+
+  def handle_info(:check, state) do
+    if Process.alive?(state) do
+        {:noreply, state}
+    else
+        {:ok, pid} = supervise_stream()
+        {:noreply, pid}
+    end
   end
 
   def restart(pid) do

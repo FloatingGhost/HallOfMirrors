@@ -1,5 +1,7 @@
 defmodule Hallofmirrors.WatchTask do
+  use Task
   import Ecto.Query
+  
   require Logger
 
   alias Hallofmirrors.{
@@ -7,15 +9,15 @@ defmodule Hallofmirrors.WatchTask do
     Account
   }
 
+  def start_link(_) do
+    Task.start_link(__MODULE__, :start_stream, [])
+  end
+
   def start_stream do
     Logger.info("Starting stream...")
 
-    spawn_link(fn ->
-      Logger.debug("Link to stream...")
-
-      ExTwitter.stream_filter([follow: get_follows()], :infinity)
-      |> Enum.map(&mirror_tweet/1)
-    end)
+    ExTwitter.stream_filter([follow: get_follows()], :infinity)
+    |> Enum.map(&mirror_tweet/1)
   end
 
   defp get_follows do
