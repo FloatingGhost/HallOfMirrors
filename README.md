@@ -1,5 +1,10 @@
 # Hallofmirrors
 
+A mirror supervisor for twitter -> fediverse accounts
+
+it is required to set up your twitter API credentials before use,
+the basic config is in `config/config.exs`
+
 To start your Phoenix server:
 
   * Install dependencies with `mix deps.get`
