@@ -44,15 +44,6 @@ defmodule Hallofmirrors.StreamWatcher do
     {:noreply, pid}
   end
 
-  def handle_info(:check, state) do
-    if Process.alive?(state) do
-        {:noreply, state}
-    else
-        {:ok, pid} = supervise_stream()
-        {:noreply, pid}
-    end
-  end
-
   def restart(pid) do
     Logger.debug("Throwing restart...")
     GenServer.cast(pid, {:restart})

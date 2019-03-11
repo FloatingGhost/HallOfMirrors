@@ -16,8 +16,14 @@ defmodule Hallofmirrors.WatchTask do
   def start_stream do
     Logger.info("Starting stream...")
 
-    ExTwitter.stream_filter([follow: get_follows()], :infinity)
-    |> Enum.map(&mirror_tweet/1)
+    try do
+        ExTwitter.stream_filter([follow: get_follows()], :infinity)
+        |> Enum.map(&mirror_tweet/1)
+    rescue
+        _ ->
+            Logger.info("Error hit!")
+            start_stream()
+    end
   end
 
   defp get_follows do
@@ -114,12 +120,15 @@ defmodule Hallofmirrors.WatchTask do
       filename = get_filename(url)
       headers = [{"authorization", account.token}]
       post_body = [{:file, filename}]
-      req = HTTPoison.post(upload_url, {:multipart, post_body}, headers)
+      options = [timeout: 30_000, recv_timeout: 30_000]
+      req = HTTPoison.post(upload_url, {:multipart, post_body}, headers, options)
 
       case req do
         {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
           {:ok, body} = Jason.decode(body)
           body["id"]
+        {:error, _} ->
+          {:error, nil}
       end
     end)
   end

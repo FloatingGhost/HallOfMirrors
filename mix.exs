@@ -44,7 +44,7 @@ defmodule Hallofmirrors.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:httpoison, "~> 1.4"},
-      {:extwitter, "~> 0.9.3"}
+      {:extwitter, git: "https://github.com/pjskennedy/extwitter.git"}
     ]
   end
 
