@@ -5,6 +5,7 @@
       <tr>
         <th>Name</th>
         <th>Last Tweeted At</th>
+        <th>Media only?</th>
         <th>Mirroring</th>
         <th></th>
       </tr>

@@ -10,13 +10,14 @@ defmodule Hallofmirrors.Account do
     field :password, :string, virtual: true
     field :mirroring, :string, virtual: true
     field :last_tweeted_at, :utc_datetime_usec
+    field :media_only, :boolean, default: false
 
     belongs_to :instance, Hallofmirrors.Instance
   end
 
   def create_changeset(struct, %{} = params) do
     struct
-    |> cast(params, [:name, :twitter_tags, :email, :password, :mirroring])
+    |> cast(params, [:name, :twitter_tags, :email, :password, :mirroring, :media_only])
     |> validate_required([:name, :email, :password])
     |> put_twitter_tags()
     |> validate_login(params)
@@ -25,7 +26,7 @@ defmodule Hallofmirrors.Account do
 
   def edit_changeset(struct, params) do
     struct
-    |> cast(params, [:name, :twitter_tags, :mirroring])
+    |> cast(params, [:name, :twitter_tags, :mirroring, :media_only])
     |> put_twitter_tags()
   end
 

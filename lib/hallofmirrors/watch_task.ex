@@ -84,26 +84,33 @@ defmodule Hallofmirrors.WatchTask do
   end
 
   def send_via_account(account, tweet) do
-    media_ids = upload_media(account, tweet)
+    photo_count = 
+      tweet
+      |> get_photos()
+      |> Enum.count()
 
-    create_url =
-      account.instance.url
-      |> URI.merge("/api/v1/statuses")
-      |> URI.to_string()
+    unless account.media_only and photo_count == 0 do
+      media_ids = upload_media(account, tweet)
 
-    post_body =
-      [
-        {"status", tweet.text},
-        {"visibility", "public"},
-        {"sensitive", "false"}
-      ] ++ Enum.map(media_ids, fn x -> {"media_ids[]", x} end)
+      create_url =
+        account.instance.url
+        |> URI.merge("/api/v1/statuses")
+        |> URI.to_string()
 
-    headers = [{"authorization", account.token}]
-    req = HTTPoison.post(create_url, {:multipart, post_body}, headers)
+      post_body =
+        [
+          {"status", tweet.text},
+          {"visibility", "public"},
+          {"sensitive", "false"}
+        ] ++ Enum.map(media_ids, fn x -> {"media_ids[]", x} end)
 
-    account
-    |> Account.last_tweeted_changeset()
-    |> Repo.update()
+      headers = [{"authorization", account.token}]
+      req = HTTPoison.post(create_url, {:multipart, post_body}, headers)
+
+      account
+      |> Account.last_tweeted_changeset()
+      |> Repo.update()
+    end
   end
 
   defp upload_media(account, tweet) do

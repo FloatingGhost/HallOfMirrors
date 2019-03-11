@@ -1,6 +1,7 @@
 <tr>
   <td><%= @account.name %></td>
   <td><%= @account.last_tweeted_at %></td>
+  <td><%= @account.media_only %></td>
   <td><%= Enum.join(@account.twitter_tags, ", ") %></td>
   <td><a href="/accounts/<%= @account.id %>"><button>Edit</button></a></td>
 </tr>

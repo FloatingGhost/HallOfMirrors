@@ -14,5 +14,9 @@
   <label for="mirroring">Mirroring: </label>
   <input name="mirroring" type="text" placeholder="@meme @test @hello" />
 
+  <input name="media_only" type="hidden"   value="false">
+  <input name="media_only" type="checkbox" value="true">Media Only</input>
+  <br />
+
   <button>Add</button>
 </form>

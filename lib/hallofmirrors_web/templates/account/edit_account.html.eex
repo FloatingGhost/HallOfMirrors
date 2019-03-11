@@ -6,6 +6,12 @@
     <label for="mirroring">Mirroring: </label>
     <input name="mirroring" type="text" placeholder="@meme @test @hello" value="<%= Enum.join(@account.twitter_tags, " ") %>" />
 
+    <label for="media_only">Media Only</label>
+
+    <input name="media_only" type="hidden"   value="false">
+    <input name="media_only" type="checkbox" value="true" <%= if @account.media_only do %>checked="checked"<% end %>>Media Only</input>
+    <br />
+
     <button>Save</button>
   </form>
 </section>
