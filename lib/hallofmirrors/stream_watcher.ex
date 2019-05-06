@@ -28,10 +28,7 @@ defmodule Hallofmirrors.StreamWatcher do
   end
 
   defp supervise_stream do
-    [
-      Supervisor.child_spec({Hallofmirrors.WatchTask, [:start_stream]}, id: :twitter),
-      Supervisor.child_spec({Hallofmirrors.WatchTask, [:subreddit_loop]}, id: :reddit)
-    ]
+    [Hallofmirrors.WatchTask]
     |> Supervisor.start_link(strategy: :one_for_one)
   end
 
@@ -50,5 +47,10 @@ defmodule Hallofmirrors.StreamWatcher do
   def restart(pid) do
     Logger.debug("Throwing restart...")
     GenServer.cast(pid, {:restart})
+  end
+
+  def restart do
+    {:ok, pid} = Hallofmirrors.StreamWatcher.start_link([])
+    Hallofmirrors.StreamWatcher.restart(pid)
   end
 end

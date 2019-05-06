@@ -32,6 +32,13 @@ config :hallofmirrors, :reddit,
   client_id: "",
   secret: ""
 
+config :hallofmirrors, Hallofmirrors.Scheduler,
+  jobs: [
+    # Every 15 minutes
+    {"*/15 * * * *", {Hallofmirrors.SubredditMirror, :check_all, []}},
+    {"10 */2 * * *", {Hallofmirrors.StreamWatcher, :restart, []}}
+  ]
+
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 

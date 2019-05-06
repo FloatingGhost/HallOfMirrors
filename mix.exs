@@ -47,7 +47,9 @@ defmodule Hallofmirrors.MixProject do
       {:extwitter,
        git: "https://github.com/pjskennedy/extwitter.git",
        branch: "inconsistent-chunking-streaming-api"},
-      {:reddit, "~> 0.1.1"}
+      {:reddit, "~> 0.1.1"},
+      {:quantum, "~> 2.3"},
+      {:timex, "~> 3.0"}
     ]
   end
 
