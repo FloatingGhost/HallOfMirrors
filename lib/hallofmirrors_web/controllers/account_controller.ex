@@ -39,4 +39,11 @@ defmodule HallofmirrorsWeb.AccountController do
       redirect(conn, to: "/")
     end
   end
+
+  def delete(conn, %{"id" => id} = params) do
+    with %Account{} = account <- Repo.get(Account, id) do
+        Repo.delete(account)
+        redirect(conn, to: "/")
+    end
+  end
 end
