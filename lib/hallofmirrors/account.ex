@@ -6,7 +6,7 @@ defmodule Hallofmirrors.Account do
     field :name, :string
     field :token, :string
     field :twitter_tags, {:array, :string}
-    field :subreddits, {:array, :string}
+    field :subreddits, {:array, :string}, default: []
     field :email, :string, virtual: true
     field :password, :string, virtual: true
     field :mirroring, :string, virtual: true
