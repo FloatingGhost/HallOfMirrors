@@ -220,7 +220,7 @@ defmodule Hallofmirrors.WatchTask do
           {:ok, body} = Jason.decode(body)
           body["id"]
 
-        {:error, _} ->
+        _other ->
           {:error, nil}
       end
     end)
@@ -244,7 +244,7 @@ defmodule Hallofmirrors.WatchTask do
         {:ok, body} = Jason.decode(body)
         body["id"]
 
-      {:error, _} ->
+      _other ->
         {:error, nil}
     end
   end
