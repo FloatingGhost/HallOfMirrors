@@ -6,6 +6,7 @@ defmodule Hallofmirrors.Account do
     field :name, :string
     field :token, :string
     field :twitter_tags, {:array, :string}
+    field :subreddits, {:array, :string}
     field :email, :string, virtual: true
     field :password, :string, virtual: true
     field :mirroring, :string, virtual: true
@@ -20,6 +21,7 @@ defmodule Hallofmirrors.Account do
     |> cast(params, [:name, :twitter_tags, :email, :password, :mirroring, :media_only])
     |> validate_required([:name, :email, :password])
     |> put_twitter_tags()
+    |> put_subreddits()
     |> validate_login(params)
     |> put_assoc(:instance, params["instance"])
   end
@@ -28,6 +30,7 @@ defmodule Hallofmirrors.Account do
     struct
     |> cast(params, [:name, :twitter_tags, :mirroring, :media_only])
     |> put_twitter_tags()
+    |> put_subreddits()
   end
 
   def last_tweeted_changeset(struct) do
@@ -58,10 +61,28 @@ defmodule Hallofmirrors.Account do
       :twitter_tags,
       mirroring
       |> String.split(" ")
+      |> Enum.filter(fn tag -> String.starts_with?(tag, "@") end)
       |> Enum.map(fn tag ->
         tag
         |> String.trim()
         |> String.replace_leading("@", "")
+        |> String.downcase()
+      end)
+      |> Enum.filter(fn x -> x != "" end)
+    )
+  end
+
+  defp put_subreddits(%{changes: %{mirroring: mirroring}} = changeset) do
+    changeset
+    |> put_change(
+      :subreddits,
+      mirroring
+      |> String.split(" ")
+      |> Enum.filter(fn tag -> String.starts_with?(tag, "r/") end)
+      |> Enum.map(fn tag ->
+        tag
+        |> String.trim()
+        |> String.replace_leading("r/", "")
         |> String.downcase()
       end)
       |> Enum.filter(fn x -> x != "" end)

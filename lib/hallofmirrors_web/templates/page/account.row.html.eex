@@ -2,8 +2,8 @@
   <td><%= @account.name %></td>
   <td><%= @account.last_tweeted_at %></td>
   <td><%= @account.media_only %></td>
-  <td><%= Enum.join(@account.twitter_tags, ", ") %></td>
-  <td><form><a href="/accounts/<%= @account.id %>"><button>Edit</button></a></form></td>
+  <td><%= Enum.join(@account.twitter_tags ++ @account.subreddits, ", ") %></td>
+  <td><a href="/accounts/<%= @account.id %>"><button>Edit</button></a></td>
   <td>
     <%= form_tag("/accounts/#{@account.id}", method: :delete) %>
         <button>Delete</button>

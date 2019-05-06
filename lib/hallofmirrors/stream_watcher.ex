@@ -28,7 +28,10 @@ defmodule Hallofmirrors.StreamWatcher do
   end
 
   defp supervise_stream do
-    [{ Hallofmirrors.WatchTask, [] }]
+    [
+      Supervisor.child_spec({Hallofmirrors.WatchTask, [:start_stream]}, id: :twitter),
+      Supervisor.child_spec({Hallofmirrors.WatchTask, [:subreddit_loop]}, id: :reddit)
+    ]
     |> Supervisor.start_link(strategy: :one_for_one)
   end
 

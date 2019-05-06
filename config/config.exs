@@ -28,6 +28,10 @@ config :extwitter, :oauth,
   access_token: "",
   access_token_secret: ""
 
+config :hallofmirrors, :reddit,
+  client_id: "",
+  secret: ""
+
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
