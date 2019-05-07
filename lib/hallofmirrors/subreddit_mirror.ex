@@ -40,18 +40,13 @@ defmodule Hallofmirrors.SubredditMirror do
             ["png", "gif", "jpg"]
             |> Enum.any?(fn ext -> String.ends_with?(url, ext) end)
           end)
-          |> Enum.filter(fn url ->
-            x =
-              Repo.get_by(SubredditLog,
-                post_id: url,
-                account_id: account.id
-              )
-
-            is_nil(x)
-          end)
           |> (&Enum.uniq(acc ++ &1)).()
         end
       )
+      |> Enum.filter(fn url ->
+       x = Repo.get_by(SubredditLog, post_id: url,)
+       is_nil(x)
+      end)
 
     images
     |> Enum.map(fn image ->
