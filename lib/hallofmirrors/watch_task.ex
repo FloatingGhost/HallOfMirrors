@@ -104,7 +104,7 @@ defmodule Hallofmirrors.WatchTask do
       post_body =
         [
           {"status", tweet.text},
-          {"visibility", "public"},
+          {"visibility", "unlisted"},
           {"sensitive", "false"}
         ] ++ Enum.map(media_ids, fn x -> {"media_ids[]", x} end)
 

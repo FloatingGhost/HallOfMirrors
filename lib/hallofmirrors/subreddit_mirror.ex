@@ -65,7 +65,7 @@ defmodule Hallofmirrors.SubredditMirror do
       post_body =
         [
           {"status", "."},
-          {"visibility", "public"},
+          {"visibility", "unlisted"},
           {"sensitive", "false"}
         ] ++ Enum.map([image], fn x -> {"media_ids[]", x} end)
 
