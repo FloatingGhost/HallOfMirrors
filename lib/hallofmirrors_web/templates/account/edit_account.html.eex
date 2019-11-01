@@ -4,7 +4,7 @@
     <input name="name" required type="text" value="<%= @account.name %>"/>
 
     <label for="mirroring">Mirroring: </label>
-    <input name="mirroring" type="text" placeholder="@meme @test @hello" value="<%= Enum.join(@account.twitter_tags, " ") %>" />
+    <input name="mirroring" type="text" placeholder="@meme @test @hello" value="<%= Enum.join(Enum.map(@account.twitter_tags, fn x -> "@" <> x end) ++ Enum.map(@account.subreddits, fn x -> "r/" <> x end), " ") %>" />
 
     <label for="media_only">Media Only</label>
 
