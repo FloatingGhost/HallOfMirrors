@@ -35,21 +35,21 @@ defmodule Hallofmirrors.SubredditMirror do
             |> Reddit.Subreddit.hot_posts(sub)
 
           resp
-          |> Enum.map(fn %{"data" => %{"url" => url}} -> url end)
-          |> Enum.filter(fn url ->
+          |> Enum.map(fn %{"data" => %{"url" => url, "title" => title}} -> {url, title} end)
+          |> Enum.filter(fn {url, _} ->
             ["png", "gif", "jpg"]
             |> Enum.any?(fn ext -> String.ends_with?(url, ext) end)
           end)
           |> (&Enum.uniq(acc ++ &1)).()
         end
       )
-      |> Enum.filter(fn url ->
-       x = Repo.get_by(SubredditLog, post_id: url,)
+      |> Enum.filter(fn {url, _} ->
+       x = Repo.get_by(SubredditLog, post_id: url)
        is_nil(x)
       end)
 
     images
-    |> Enum.map(fn image ->
+    |> Enum.map(fn {image, title} ->
       original_url = image
       filename = get_filename(image)
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} = HTTPoison.get(image)
@@ -64,13 +64,13 @@ defmodule Hallofmirrors.SubredditMirror do
 
       post_body =
         [
-          {"status", "."},
+          {"status", title},
           {"visibility", "unlisted"},
           {"sensitive", "false"}
         ] ++ Enum.map([image], fn x -> {"media_ids[]", x} end)
 
       headers = [{"authorization", account.token}]
-      req = HTTPoison.post(create_url, {:multipart, post_body}, headers)
+      _req = HTTPoison.post(create_url, {:multipart, post_body}, headers)
 
       account
       |> Account.last_tweeted_changeset()
