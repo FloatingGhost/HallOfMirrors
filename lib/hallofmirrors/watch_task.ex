@@ -144,7 +144,7 @@ defmodule Hallofmirrors.WatchTask do
     tweet
     |> get_photos()
     |> Enum.map(fn entity ->
-      url = entity.media_url_https
+      url = get_url(entity)
       filename = get_filename(url)
       headers = [{"authorization", account.token}]
       post_body = [{:file, filename}]
