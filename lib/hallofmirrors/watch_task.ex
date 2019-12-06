@@ -63,9 +63,8 @@ defmodule Hallofmirrors.WatchTask do
       tweet
       |> get_photos()
       |> Enum.map(fn entity ->
-        url = entity.media_url_https
+        url = get_url(entity)
         filename = get_filename(url)
-
         {:ok, %HTTPoison.Response{status_code: 200, body: body}} = HTTPoison.get(url)
         :ok = File.write(filename, body)
       end)
@@ -80,10 +79,28 @@ defmodule Hallofmirrors.WatchTask do
       tweet
       |> get_photos()
       |> Enum.map(fn entity ->
-        url = entity.media_url_https
+        url = get_url(entity)
         filename = get_filename(url)
         :ok = File.rm(filename)
       end)
+    end
+  end
+
+  def get_url(entity) do
+    case entity.type do
+      "photo" ->
+        entity.media_url_https
+
+      "video" ->
+        %{url: u} =
+          entity.video_info.variants
+          |> Enum.filter(fn x -> Map.has_key?(x, :bitrate) end)
+          |> Enum.filter(fn %{bitrate: b} -> b == 832_000 end)
+          |> List.first()
+
+        u
+        |> String.split("?")
+        |> List.first()
     end
   end
 
@@ -165,7 +182,7 @@ defmodule Hallofmirrors.WatchTask do
       end
 
     media_list
-    |> Enum.filter(fn entity -> entity.type == "photo" end)
+    |> Enum.filter(fn entity -> Enum.member?(["photo", "video"], entity.type) end)
   end
 
   defp get_photos(_), do: []

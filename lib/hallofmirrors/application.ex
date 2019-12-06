@@ -17,11 +17,12 @@ defmodule Hallofmirrors.Application do
       Hallofmirrors.Scheduler
     ]
 
-    children = if Mix.env == :prod do
+    children =
+      if Mix.env() == :prod do
         children ++ [Hallofmirrors.StreamWatcher]
-    else
+      else
         children
-    end
+      end
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

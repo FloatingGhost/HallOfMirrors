@@ -44,8 +44,8 @@ defmodule Hallofmirrors.SubredditMirror do
         end
       )
       |> Enum.filter(fn {url, _} ->
-       x = Repo.get_by(SubredditLog, post_id: url)
-       is_nil(x)
+        x = Repo.get_by(SubredditLog, post_id: url)
+        is_nil(x)
       end)
 
     images
