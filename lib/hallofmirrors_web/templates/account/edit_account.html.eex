@@ -10,6 +10,7 @@
 
     <input name="media_only" type="hidden"   value="false">
     <input name="media_only" type="checkbox" value="true" <%= if @account.media_only do %>checked="checked"<% end %>>Media Only</input>
+    <input name="must_include" type="text" placeholder="#abc" value="<%= @account.must_include %>" />
     <br />
 
     <button>Save</button>

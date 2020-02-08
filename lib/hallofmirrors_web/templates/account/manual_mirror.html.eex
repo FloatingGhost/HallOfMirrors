@@ -1,0 +1,9 @@
+<section>
+  <%= form_tag("/accounts/#{@account.id}/mirror", method: :post) %>
+    <label for="tweet_id">Tweet ID: </label>
+    <input name="tweet_id" required type="text" value="" />
+    <br />
+
+    <button>Mirror</button>
+  </form>
+</section>

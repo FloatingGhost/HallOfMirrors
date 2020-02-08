@@ -6,6 +6,7 @@ defmodule Hallofmirrors.Account do
     field :name, :string
     field :token, :string
     field :twitter_tags, {:array, :string}
+    field :must_include, :string, default: ""
     field :subreddits, {:array, :string}, default: []
     field :email, :string, virtual: true
     field :password, :string, virtual: true
@@ -18,7 +19,15 @@ defmodule Hallofmirrors.Account do
 
   def create_changeset(struct, %{} = params) do
     struct
-    |> cast(params, [:name, :twitter_tags, :email, :password, :mirroring, :media_only])
+    |> cast(params, [
+      :name,
+      :twitter_tags,
+      :email,
+      :password,
+      :mirroring,
+      :media_only,
+      :must_include
+    ])
     |> validate_required([:name, :email, :password])
     |> put_twitter_tags()
     |> put_subreddits()
@@ -28,7 +37,7 @@ defmodule Hallofmirrors.Account do
 
   def edit_changeset(struct, params) do
     struct
-    |> cast(params, [:name, :twitter_tags, :mirroring, :media_only])
+    |> cast(params, [:name, :twitter_tags, :mirroring, :media_only, :must_include])
     |> put_twitter_tags()
     |> put_subreddits()
   end

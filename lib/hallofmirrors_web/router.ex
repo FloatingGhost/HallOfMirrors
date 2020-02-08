@@ -21,6 +21,8 @@ defmodule HallofmirrorsWeb.Router do
     get "/accounts/:id", AccountController, :edit_form
     post "/accounts/:id", AccountController, :edit
     delete "/accounts/:id", AccountController, :delete
+    get "/accounts/:id/mirror", AccountController, :mirror_form
+    post "/accounts/:id/mirror", AccountController, :mirror
   end
 
   # Other scopes may use custom stacks.

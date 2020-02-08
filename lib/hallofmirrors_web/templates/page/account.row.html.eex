@@ -9,4 +9,5 @@
         <button>Delete</button>
     </form>
   </td>
+  <td><a href="/accounts/<%= @account.id %>/mirror"><button>Mirror</button></a></td>
 </tr>

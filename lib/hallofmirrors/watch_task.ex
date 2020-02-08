@@ -58,16 +58,10 @@ defmodule Hallofmirrors.WatchTask do
       from(account in Account, where: ^from_user in account.twitter_tags)
       |> preload(:instance)
       |> Repo.all()
+      |> Enum.filter(fn account -> String.contains?(tweet.text, account.must_include) end)
 
     unless Enum.count(mirror_to) == 0 do
-      tweet
-      |> get_photos()
-      |> Enum.map(fn entity ->
-        url = get_url(entity)
-        filename = get_filename(url)
-        {:ok, %HTTPoison.Response{status_code: 200, body: body}} = HTTPoison.get(url)
-        :ok = File.write(filename, body)
-      end)
+      download_photos(tweet)
 
       mirror_to
       |> Task.async_stream(Hallofmirrors.WatchTask, :send_via_account, [tweet],
@@ -76,14 +70,29 @@ defmodule Hallofmirrors.WatchTask do
       )
       |> Enum.into([])
 
-      tweet
-      |> get_photos()
-      |> Enum.map(fn entity ->
-        url = get_url(entity)
-        filename = get_filename(url)
-        :ok = File.rm(filename)
-      end)
+      delete_photos(tweet)
     end
+  end
+
+  def download_photos(tweet) do
+    tweet
+    |> get_photos()
+    |> Enum.map(fn entity ->
+      url = get_url(entity)
+      filename = get_filename(url)
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} = HTTPoison.get(url)
+      :ok = File.write(filename, body)
+    end)
+  end
+
+  def delete_photos(tweet) do
+    tweet
+    |> get_photos()
+    |> Enum.map(fn entity ->
+      url = get_url(entity)
+      filename = get_filename(url)
+      :ok = File.rm(filename)
+    end)
   end
 
   def get_url(entity) do

@@ -4,7 +4,8 @@ defmodule HallofmirrorsWeb.AccountController do
   alias Hallofmirrors.{
     Instance,
     Account,
-    Repo
+    Repo,
+    WatchTask
   }
 
   def create(conn, %{"instance_url" => url} = params) do
@@ -37,6 +38,25 @@ defmodule HallofmirrorsWeb.AccountController do
       {:ok, pid} = Hallofmirrors.StreamWatcher.start_link([])
       Hallofmirrors.StreamWatcher.restart(pid)
       redirect(conn, to: "/")
+    end
+  end
+
+  def mirror_form(conn, %{"id" => id}) do
+    with %Account{} = account <- Repo.get(Account, id) do
+      render(conn, "manual_mirror.html", account: account)
+    end
+  end
+
+  def mirror(conn, %{"id" => id, "tweet_id" => tweet_id}) do
+    IO.puts(tweet_id)
+    with %Account{} = account <- Repo.get(Account, id),
+	 %Account{} = account <- Repo.preload(account, [:instance]),
+         %{} = tweet <- ExTwitter.show(tweet_id) do
+	
+      WatchTask.download_photos(tweet)
+      WatchTask.send_via_account(account, tweet)
+      WatchTask.delete_photos(tweet)
+      redirect(conn, to: "/accounts/#{id}")
     end
   end
 

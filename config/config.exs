@@ -35,7 +35,7 @@ config :hallofmirrors, :reddit,
 config :hallofmirrors, Hallofmirrors.Scheduler,
   jobs: [
     # Every 15 minutes
-    {"*/15 * * * *", {Hallofmirrors.SubredditMirror, :check_all, []}},
+    {"*/15 * * * *", {Hallofmirrors.SubredditMirror, :check_all, []}}
   ]
 
 # Use Jason for JSON parsing in Phoenix
