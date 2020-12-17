@@ -54,7 +54,7 @@ defmodule HallofmirrorsWeb.AccountController do
          %{} = tweet <- ExTwitter.show(tweet_id) do
 	
       WatchTask.download_photos(tweet)
-      WatchTask.send_via_account(account, tweet, "")
+      WatchTask.send_via_account(account, tweet)
       WatchTask.delete_photos(tweet)
       redirect(conn, to: "/accounts/#{id}")
     end

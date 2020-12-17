@@ -64,7 +64,7 @@ defmodule Hallofmirrors.WatchTask do
       download_photos(tweet)
 
       mirror_to
-      |> Task.async_stream(Hallofmirrors.WatchTask, :send_via_account, [tweet, from_user],
+      |> Task.async_stream(Hallofmirrors.WatchTask, :send_via_account, [tweet],
         timeout: 60_000,
         on_timeout: :kill_task
       )
@@ -114,7 +114,7 @@ defmodule Hallofmirrors.WatchTask do
     end
   end
 
-  def send_via_account(account, tweet, from_user="") do
+  def send_via_account(account, tweet) do
     photo_count =
       tweet
       |> get_photos()
@@ -128,15 +128,15 @@ defmodule Hallofmirrors.WatchTask do
         |> URI.merge("/api/v1/statuses")
         |> URI.to_string()
 
-      from_text = if from_user == "" do
-        ""
-      else
-        "#{from_user}: "
-      end
+      from_user = tweet
+      |> Map.get(:user)
+      |> Map.get(:screen_name)
+      |> String.downcase()
+
 
       post_body =
         [
-          {"status", "#{from_text}: #{tweet.text}"},
+          {"status", "#{from_user}: #{tweet.text}"},
           {"visibility", "unlisted"},
           {"sensitive", "false"}
         ] ++ Enum.map(media_ids, fn x -> {"media_ids[]", x} end)
