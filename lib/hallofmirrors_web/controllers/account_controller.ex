@@ -18,7 +18,7 @@ defmodule HallofmirrorsWeb.AccountController do
     changeset = Account.create_changeset(%Account{}, params)
 
     if changeset.valid? do
-      {:ok, account} = Repo.insert(changeset)
+      {:ok, _account} = Repo.insert(changeset)
       {:ok, pid} = Hallofmirrors.StreamWatcher.start_link([])
       Hallofmirrors.StreamWatcher.restart(pid)
       redirect(conn, to: "/")
@@ -54,13 +54,13 @@ defmodule HallofmirrorsWeb.AccountController do
          %{} = tweet <- ExTwitter.show(tweet_id) do
 	
       WatchTask.download_photos(tweet)
-      WatchTask.send_via_account(account, tweet)
+      WatchTask.send_via_account(account, tweet, "")
       WatchTask.delete_photos(tweet)
       redirect(conn, to: "/accounts/#{id}")
     end
   end
 
-  def delete(conn, %{"id" => id} = params) do
+  def delete(conn, %{"id" => id}) do
     with %Account{} = account <- Repo.get(Account, id) do
       Repo.delete(account)
       redirect(conn, to: "/")

@@ -4,6 +4,8 @@ defmodule Hallofmirrors.WatchTask do
 
   require Logger
 
+  @http_options [ssl: [{:versions, [:"tlsv1.2"]}]]
+
   alias Hallofmirrors.{
     Repo,
     Account
@@ -53,18 +55,16 @@ defmodule Hallofmirrors.WatchTask do
       |> Map.get(:user)
       |> Map.get(:screen_name)
       |> String.downcase()
-
     mirror_to =
       from(account in Account, where: ^from_user in account.twitter_tags)
       |> preload(:instance)
       |> Repo.all()
       |> Enum.filter(fn account -> String.contains?(tweet.text, account.must_include) end)
-
     unless Enum.count(mirror_to) == 0 do
       download_photos(tweet)
 
       mirror_to
-      |> Task.async_stream(Hallofmirrors.WatchTask, :send_via_account, [tweet],
+      |> Task.async_stream(Hallofmirrors.WatchTask, :send_via_account, [tweet, from_user],
         timeout: 60_000,
         on_timeout: :kill_task
       )
@@ -75,12 +75,14 @@ defmodule Hallofmirrors.WatchTask do
   end
 
   def download_photos(tweet) do
+    IO.inspect(tweet)
     tweet
     |> get_photos()
     |> Enum.map(fn entity ->
       url = get_url(entity)
       filename = get_filename(url)
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} = HTTPoison.get(url)
+
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} = HTTPoison.get(url, [], @http_options)
       :ok = File.write(filename, body)
     end)
   end
@@ -104,7 +106,6 @@ defmodule Hallofmirrors.WatchTask do
         %{url: u} =
           entity.video_info.variants
           |> Enum.filter(fn x -> Map.has_key?(x, :bitrate) end)
-          |> Enum.filter(fn %{bitrate: b} -> b == 832_000 end)
           |> List.first()
 
         u
@@ -113,7 +114,7 @@ defmodule Hallofmirrors.WatchTask do
     end
   end
 
-  def send_via_account(account, tweet) do
+  def send_via_account(account, tweet, from_user="") do
     photo_count =
       tweet
       |> get_photos()
@@ -127,15 +128,21 @@ defmodule Hallofmirrors.WatchTask do
         |> URI.merge("/api/v1/statuses")
         |> URI.to_string()
 
+      from_text = if from_user == "" do
+        ""
+      else
+        "#{from_user}: "
+      end
+
       post_body =
         [
-          {"status", tweet.text},
+          {"status", "#{from_text}: #{tweet.text}"},
           {"visibility", "unlisted"},
           {"sensitive", "false"}
         ] ++ Enum.map(media_ids, fn x -> {"media_ids[]", x} end)
 
       headers = [{"authorization", account.token}]
-      req = HTTPoison.post(create_url, {:multipart, post_body}, headers)
+      HTTPoison.post(create_url, {:multipart, post_body}, headers, @http_options)
 
       account
       |> Account.last_tweeted_changeset()

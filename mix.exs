@@ -44,7 +44,7 @@ defmodule Hallofmirrors.MixProject do
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
-      {:httpoison, "~> 1.4"},
+      {:httpoison, "~> 1.7"},
       {:extwitter,
        git: "https://github.com/pjskennedy/extwitter.git",
        branch: "inconsistent-chunking-streaming-api"},
