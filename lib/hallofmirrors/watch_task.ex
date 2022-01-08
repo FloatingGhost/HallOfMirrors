@@ -23,8 +23,9 @@ defmodule Hallofmirrors.WatchTask do
       ExTwitter.stream_filter([follow: get_follows()], :infinity)
       |> Enum.map(&mirror_tweet/1)
     rescue
-      _ ->
+      e ->
         Logger.info("Error hit!")
+        Logger.info(e)
         start_stream()
     end
   end
@@ -104,7 +105,7 @@ defmodule Hallofmirrors.WatchTask do
 
       "video" ->
         %{url: u} =
-          entity.video_info.variants
+          entity.raw_data.video_info.variants
           |> Enum.filter(fn x -> Map.has_key?(x, :bitrate) end)
           |> List.first()
 

@@ -34,8 +34,8 @@ defmodule Hallofmirrors.MixProject do
   defp deps do
     [
       {:hackney, github: "benoitc/hackney", override: true},
-      {:phoenix, "~> 1.4.1"},
-      {:phoenix_pubsub, "~> 1.1"},
+      {:phoenix, "~> 1.6.6"},
+      {:phoenix_pubsub, "~> 2.0"},
       {:phoenix_ecto, "~> 4.0"},
       {:ecto_sql, "~> 3.0"},
       {:postgrex, ">= 0.0.0"},
