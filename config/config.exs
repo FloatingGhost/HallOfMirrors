@@ -5,7 +5,9 @@
 # is restricted to this project.
 
 # General application configuration
-use Mix.Config
+import Config
+
+config :tesla, :adapter, {Tesla.Adapter.Finch, name: MyFinch}
 
 config :hallofmirrors,
   ecto_repos: [Hallofmirrors.Repo]

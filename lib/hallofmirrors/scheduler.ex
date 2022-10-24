@@ -1,4 +1,4 @@
 defmodule Hallofmirrors.Scheduler do
-  use Quantum.Scheduler,
+  use Quantum,
     otp_app: :hallofmirrors
 end

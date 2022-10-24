@@ -49,10 +49,10 @@ defmodule HallofmirrorsWeb.AccountController do
 
   def mirror(conn, %{"id" => id, "tweet_id" => tweet_id}) do
     IO.puts(tweet_id)
+
     with %Account{} = account <- Repo.get(Account, id),
-	 %Account{} = account <- Repo.preload(account, [:instance]),
+         %Account{} = account <- Repo.preload(account, [:instance]),
          %{} = tweet <- ExTwitter.show(tweet_id) do
-	
       WatchTask.download_photos(tweet)
       WatchTask.send_via_account(account, tweet)
       WatchTask.delete_photos(tweet)

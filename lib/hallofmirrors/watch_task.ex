@@ -56,11 +56,13 @@ defmodule Hallofmirrors.WatchTask do
       |> Map.get(:user)
       |> Map.get(:screen_name)
       |> String.downcase()
+
     mirror_to =
       from(account in Account, where: ^from_user in account.twitter_tags)
       |> preload(:instance)
       |> Repo.all()
       |> Enum.filter(fn account -> String.contains?(tweet.text, account.must_include) end)
+
     unless Enum.count(mirror_to) == 0 do
       download_photos(tweet)
 
@@ -77,13 +79,16 @@ defmodule Hallofmirrors.WatchTask do
 
   def download_photos(tweet) do
     IO.inspect(tweet)
+
     tweet
     |> get_photos()
     |> Enum.map(fn entity ->
       url = get_url(entity)
       filename = get_filename(url)
 
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} = HTTPoison.get(url, [], @http_options)
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} =
+        HTTPoison.get(url, [], @http_options)
+
       :ok = File.write(filename, body)
     end)
   end
@@ -129,21 +134,22 @@ defmodule Hallofmirrors.WatchTask do
         |> URI.merge("/api/v1/statuses")
         |> URI.to_string()
 
-      from_user = tweet
-      |> Map.get(:user)
-      |> Map.get(:screen_name)
-      |> String.downcase()
-
+      from_user =
+        tweet
+        |> Map.get(:user)
+        |> Map.get(:screen_name)
+        |> String.downcase()
 
       post_body =
-        [
-          {"status", "#{from_user}: #{tweet.text}"},
-          {"visibility", "unlisted"},
-          {"sensitive", "false"}
-        ] ++ Enum.map(media_ids, fn x -> {"media_ids[]", x} end)
+	Tesla.Multipart.new()
+	|> Tesla.Multipart.add_field("status", "#{from_user}: #{tweet.text}")
+	|> Tesla.Multipart.add_field("visibility", "unlisted")
+	|> Tesla.Multipart.add_field("sensitive", "false")
+	|> Tesla.Multipart.add_field("media_ids[]", media_ids)
 
       headers = [{"authorization", account.token}]
-      HTTPoison.post(create_url, {:multipart, post_body}, headers, @http_options)
+      IO.puts("POST")
+      IO.inspect(Tesla.post(create_url, post_body, headers: headers))
 
       account
       |> Account.last_tweeted_changeset()
@@ -164,16 +170,20 @@ defmodule Hallofmirrors.WatchTask do
       url = get_url(entity)
       filename = get_filename(url)
       headers = [{"authorization", account.token}]
-      post_body = [{:file, filename}]
-      options = [timeout: 30_000, recv_timeout: 30_000]
-      req = HTTPoison.post(upload_url, {:multipart, post_body}, headers, options)
 
+      mp =
+        Tesla.Multipart.new()
+        |> Tesla.Multipart.add_file(filename)
+
+      req = Tesla.post(upload_url, mp, headers: headers)
+      IO.inspect(req)
       case req do
-        {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        {:ok, %Tesla.Env{status: 200, body: body}} ->
           {:ok, body} = Jason.decode(body)
           body["id"]
 
-        _other ->
+        other ->
+          IO.inspect(other)
           {:error, nil}
       end
     end)

@@ -33,24 +33,25 @@ defmodule Hallofmirrors.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:hackney, github: "benoitc/hackney", override: true},
-      {:phoenix, "~> 1.6.6"},
-      {:phoenix_pubsub, "~> 2.0"},
+      {:tesla, "~> 1.4"},
+      {:finch, "~> 0.3"},
+      {:hackney, "~> 1.18.1"},
+      {:phoenix, "~> 1.6.14"},
+      {:phoenix_pubsub, "~> 2.1"},
       {:phoenix_ecto, "~> 4.0"},
       {:ecto_sql, "~> 3.0"},
       {:postgrex, ">= 0.0.0"},
-      {:phoenix_html, "~> 2.11"},
-      {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:gettext, "~> 0.11"},
+      {:phoenix_html, "~> 3.2"},
+      {:phoenix_live_reload, "~> 1.3", only: :dev},
+      {:gettext, "~> 0.20"},
       {:jason, "~> 1.0"},
-      {:plug_cowboy, "~> 2.0"},
-      {:httpoison, "~> 1.7"},
-      {:extwitter,
-       git: "https://github.com/pjskennedy/extwitter.git",
-       branch: "inconsistent-chunking-streaming-api"},
-      {:reddit, "~> 0.1.1"},
-      {:quantum, "~> 2.3"},
-      {:timex, "~> 3.0"}
+      {:plug_cowboy, "~> 2.5"},
+      {:httpoison, "~> 1.8.2"},
+      {:extwitter, "~> 0.13"},
+      {:reddit, "~> 0.2"},
+      {:quantum, "~> 3.5"},
+      {:timex, "~> 3.7"},
+      {:oauther, "~> 1.1"},
     ]
   end
 
